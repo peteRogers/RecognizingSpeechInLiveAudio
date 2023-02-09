@@ -96,9 +96,31 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
             
             if let result = result {
                 // Update the text view with the results.
+                if #available(iOS 14.0, *) {
+                   // print(result.speechRecognitionMetadata?.voiceAnalytics?.jitter)
+                
                 self.textView.text = result.bestTranscription.formattedString
                 isFinal = result.isFinal
-                print("Text \(result.bestTranscription.formattedString)")
+                //print("Text \(result.bestTranscription.segments)")
+                var x = 0
+                for r in result.bestTranscription.segments{
+                    print(r.substring)
+                    //print(r.voiceAnalytics?.jitter)
+                    if(isFinal == true){
+                        let w = r.voiceAnalytics?.jitter.acousticFeatureValuePerFrame.count ?? 0
+                        let t = OutputView(frame: CGRect(x: x, y: 0, width: w*5, height: 400))
+                        t.voice = r.voiceAnalytics
+                        t.utterance = r.substring
+                        self.view.addSubview(t)
+                        t.setNeedsDisplay()
+                        x = x + w*5
+                        
+                    }
+                }
+                } else {
+                    // Fallback on earlier versions
+                }
+               //result.se
             }
             
             if error != nil || isFinal {
